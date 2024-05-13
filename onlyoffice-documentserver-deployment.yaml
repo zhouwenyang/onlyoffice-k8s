@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: documentserver
-        image: ccr.ccs.tencentyun.com/dailybo/onlyoffice-documentserver
+        image: zhouwenyang/onlyoffice-documentserver:latest
         env:
         - name: DB_TYPE
           value: "postgres"
