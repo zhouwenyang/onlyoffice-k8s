@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onlyoffice-documentserver
+spec:
+  selector:
+    matchLabels:
+      app: onlyoffice-documentserver
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: onlyoffice-documentserver
+    spec:
+      containers:
+      - name: documentserver
+        image: ccr.ccs.tencentyun.com/dailybo/onlyoffice-documentserver
+        env:
+        - name: DB_TYPE
+          value: "postgres"
+        - name: DB_HOST
+          value: "onlyoffice-postgresql"
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_NAME
+          value: "onlyoffice"
+        - name: DB_USER
+          value: "onlyoffice"
+        - name: AMQP_URI
+          value: "amqp://guest:guest@onlyoffice-rabbitmq"
+        - name: JWT_ENABLED
+          value: "false"
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+        volumeMounts:
+        - mountPath: "/var/www/onlyoffice/Data"
+          name: data-volume
+        - mountPath: "/var/log/onlyoffice"
+          name: log-volume
+        - mountPath: "/var/lib/onlyoffice/documentserver/App_Data/cache/files"
+          name: cache-volume
+        - mountPath: "/usr/share/fonts"
+          name: font-volume
+      volumes:
+      - name: data-volume
+        emptyDir: {}
+      - name: log-volume
+        emptyDir: {}
+      - name: cache-volume
+        emptyDir: {}
+      - name: font-volume
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: onlyoffice-documentserver
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 9080

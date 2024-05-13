@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onlyoffice-postgresql
+spec:
+  selector:
+    matchLabels:
+      app: onlyoffice-postgresql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: onlyoffice-postgresql
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:9.5
+        env:
+        - name: POSTGRES_DB
+          value: "onlyoffice"
+        - name: POSTGRES_USER
+          value: "onlyoffice"
+        - name: POSTGRES_HOST_AUTH_METHOD
+          value: "trust"
+        volumeMounts:
+        - mountPath: "/var/lib/postgresql"
+          name: postgres-storage
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgresql-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: onlyoffice-postgresql
+spec:
+  ports:
+  - port: 5432
+  selector:
+    app: onlyoffice-postgresql
