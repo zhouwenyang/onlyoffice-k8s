@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seq
+spec:
+  selector:
+    matchLabels:
+      app: seq
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: seq
+    spec:
+      containers:
+        - name: seq
+          image: ccr.ccs.tencentyun.com/dailybo/seq
+          env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: SEQ_RETENTION_DAYS
+              value: "30"
+            - name: SEQ_FIRSTRUN_ADMINPASSWORDHASH
+              value: "FJjefyvN/zs3VR4MTrpIqjqYEgAj4AZZ54WfhwCbyu/S20WzCg==" 
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: seq-data
+              mountPath: /data
+      volumes:
+        - name: seq-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seq
+spec:
+  selector:
+    app: seq
+  ports:
+    - protocol: TCP
+      port: 5341
+      targetPort: 80

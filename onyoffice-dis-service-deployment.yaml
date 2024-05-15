@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anyoffice-service
+spec:
+  selector:
+    matchLabels:
+      app: anyoffice-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: anyoffice-service
+    spec:
+      containers:
+        - name: anyoffice-service
+          image: ccr.ccs.tencentyun.com/dailybo/anyoffice
+          env:
+            - name: SEQSERVERURL
+              value: http://seq
+            - name: ADS_COLLECTIONS_URL
+              value: ""
+            - name: ADS_USER
+              value: ""
+            - name: ADS_PWD
+              value: ""
+            - name: ADS_DOMAIN
+              value: ""
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: anyoffice-service
+spec:
+  selector:
+    app: anyoffice-service
+  ports:
+    - protocol: TCP
+      port: 9081
+      targetPort: 80
